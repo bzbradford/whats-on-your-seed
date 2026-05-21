@@ -38,6 +38,7 @@ npm run format       # Prettier (formats .svelte, .ts, .css)
 ## Data pipeline
 
 The build script (`scripts/build-data.js`) is plain Node ESM with PapaParse. It:
+
 1. Parses both CSVs (handles BOM, embedded newlines in quoted fields)
 2. Filters APPRIL rows to `Status Group = "Active"`
 3. Splits `Active Ingredients` and `Crops` on `\n`

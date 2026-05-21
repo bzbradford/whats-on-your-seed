@@ -41,7 +41,9 @@
               >
                 {col.label}
                 {#if sortCol === col.key}
-                  {#if sortDir === 'asc'}<ChevronUp size={14} />{:else}<ChevronDown size={14} />{/if}
+                  {#if sortDir === 'asc'}<ChevronUp size={14} />{:else}<ChevronDown
+                      size={14}
+                    />{/if}
                 {:else}
                   <ChevronsUpDown size={14} class="text-gray-400" />
                 {/if}

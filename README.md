@@ -57,14 +57,14 @@ whats-on-your-seed/
 
 ## Scripts
 
-| Command | Description |
-|---|---|
+| Command              | Description                                                             |
+| -------------------- | ----------------------------------------------------------------------- |
 | `npm run build:data` | Parse CSVs → `public/data.json`. Run this whenever source data changes. |
-| `npm run dev` | Start Vite dev server (hot reload). |
-| `npm run build` | Production build → `dist/`. |
-| `npm run preview` | Serve the production build locally. |
-| `npm run format` | Auto-format all files with Prettier. |
-| `npm run lint` | Check formatting without writing. |
+| `npm run dev`        | Start Vite dev server (hot reload).                                     |
+| `npm run build`      | Production build → `dist/`.                                             |
+| `npm run preview`    | Serve the production build locally.                                     |
+| `npm run format`     | Auto-format all files with Prettier.                                    |
+| `npm run lint`       | Check formatting without writing.                                       |
 
 ---
 
@@ -90,39 +90,41 @@ whats-on-your-seed/
 Data comes from **two CSVs** that are joined during the build step.
 
 ### `Seed Treatments.csv` — ingredient reference table
+
 One row per active ingredient. Provides the **type code** (F/I/N/P/H) that drives the color badges. Key columns:
 
-| Column | Notes |
-|---|---|
-| `Seed Treatment` | Ingredient name (join key) |
-| `Type of treatment - Primary` | F, I, N, P, or H |
-| `Secondary type` | Optional secondary type code |
-| `Alfalfa`, `Corn`, `Cotton`, `Small Grains`, `Soybean` | TRUE if registered for that crop |
-| `AKA/Notes` | Known alternate names (informal; use `ALIAS_MAP` for programmatic aliasing) |
+| Column                                                 | Notes                                                                       |
+| ------------------------------------------------------ | --------------------------------------------------------------------------- |
+| `Seed Treatment`                                       | Ingredient name (join key)                                                  |
+| `Type of treatment - Primary`                          | F, I, N, P, or H                                                            |
+| `Secondary type`                                       | Optional secondary type code                                                |
+| `Alfalfa`, `Corn`, `Cotton`, `Small Grains`, `Soybean` | TRUE if registered for that crop                                            |
+| `AKA/Notes`                                            | Known alternate names (informal; use `ALIAS_MAP` for programmatic aliasing) |
 
 ### `Seed Treatments - APPRIL data.csv` — EPA product registrations
+
 One row per product registration (~615 rows, ~592 active). Key columns:
 
-| Column | Notes |
-|---|---|
+| Column                | Notes                                                          |
+| --------------------- | -------------------------------------------------------------- |
 | `Registration Number` | EPA reg #; not unique — multiple trade names can share a reg # |
-| `Active Ingredients` | **Newline-separated** within the quoted field; split on `\n` |
-| `Product Name` | Trade name (may include ® / ™) |
-| `Crops` | **Newline-separated** within the quoted field |
-| `Status Group` | Filter to `Active` only |
-| `Status` | `Registered`, `Conditionally Registered`, etc. |
+| `Active Ingredients`  | **Newline-separated** within the quoted field; split on `\n`   |
+| `Product Name`        | Trade name (may include ® / ™)                                 |
+| `Crops`               | **Newline-separated** within the quoted field                  |
+| `Status Group`        | Filter to `Active` only                                        |
+| `Status`              | `Registered`, `Conditionally Registered`, etc.                 |
 
 The build script filters to `Status Group = "Active"`, splits multi-value fields, joins to the reference table by ingredient name, and writes a flat JSON array to `public/data.json`.
 
 ### Type codes
 
-| Code | Treatment type | Badge color |
-|---|---|---|
-| F | Fungicide | Blue |
-| I | Insecticide | Amber |
-| N | Nematicide | Green |
-| P | Plant Growth Regulator | Violet |
-| H | Herbicide | Red |
+| Code | Treatment type         | Badge color |
+| ---- | ---------------------- | ----------- |
+| F    | Fungicide              | Blue        |
+| I    | Insecticide            | Amber       |
+| N    | Nematicide             | Green       |
+| P    | Plant Growth Regulator | Violet      |
+| H    | Herbicide              | Red         |
 
 ---
 
@@ -162,13 +164,13 @@ The widget is a self-contained static SPA with no server-side dependencies. Depl
 
 ## Tech stack
 
-| Layer | Choice |
-|---|---|
-| Framework | Svelte 5 (runes API) |
-| Build tool | Vite 8 |
-| Styling | Tailwind CSS v4 (`@tailwindcss/vite`) |
-| UI primitives | bits-ui 2.x (Dialog) |
-| Icons | lucide-svelte |
-| Type checking | TypeScript (strict) + svelte-check |
-| CSV parsing | PapaParse (build script only) |
-| Data | Static JSON baked at build time; no backend |
+| Layer         | Choice                                      |
+| ------------- | ------------------------------------------- |
+| Framework     | Svelte 5 (runes API)                        |
+| Build tool    | Vite 8                                      |
+| Styling       | Tailwind CSS v4 (`@tailwindcss/vite`)       |
+| UI primitives | bits-ui 2.x (Dialog)                        |
+| Icons         | lucide-svelte                               |
+| Type checking | TypeScript (strict) + svelte-check          |
+| CSV parsing   | PapaParse (build script only)               |
+| Data          | Static JSON baked at build time; no backend |

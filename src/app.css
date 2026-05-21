@@ -1,23 +1,23 @@
 @import 'tailwindcss';
 
 @theme {
-	--color-badge-f: #dbeafe;
-	--color-badge-f-text: #1e40af;
-	--color-badge-f-border: #93c5fd;
+  --color-badge-f: #dbeafe;
+  --color-badge-f-text: #1e40af;
+  --color-badge-f-border: #93c5fd;
 
-	--color-badge-i: #fef3c7;
-	--color-badge-i-text: #92400e;
-	--color-badge-i-border: #fcd34d;
+  --color-badge-i: #fef3c7;
+  --color-badge-i-text: #92400e;
+  --color-badge-i-border: #fcd34d;
 
-	--color-badge-n: #dcfce7;
-	--color-badge-n-text: #166534;
-	--color-badge-n-border: #86efac;
+  --color-badge-n: #dcfce7;
+  --color-badge-n-text: #166534;
+  --color-badge-n-border: #86efac;
 
-	--color-badge-p: #f3e8ff;
-	--color-badge-p-text: #6b21a8;
-	--color-badge-p-border: #d8b4fe;
+  --color-badge-p: #f3e8ff;
+  --color-badge-p-text: #6b21a8;
+  --color-badge-p-border: #d8b4fe;
 
-	--color-badge-h: #fee2e2;
-	--color-badge-h-text: #991b1b;
-	--color-badge-h-border: #fca5a5;
+  --color-badge-h: #fee2e2;
+  --color-badge-h-text: #991b1b;
+  --color-badge-h-border: #fca5a5;
 }
