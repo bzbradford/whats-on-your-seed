@@ -125,6 +125,7 @@ console.log(`APPRIL rows: ${apprilRows.length}`);
 
 const unmatched = new Set();
 const seenApprilNames = new Set(); // every ingredient name seen across ALL active rows
+const companyNameToNums = new Map(); // company name → Set<companyNum>
 let skipped = 0;
 const products = [];
 
@@ -142,6 +143,13 @@ for (const row of apprilRows) {
     .filter(Boolean);
 
   const crops = (row['Crops'] ?? '').split('\n').map(strip).filter(Boolean);
+
+  const companyName = strip(row['Company Name']);
+  const companyNum = strip(row['Company Number']);
+  if (companyName) {
+    if (!companyNameToNums.has(companyName)) companyNameToNums.set(companyName, new Set());
+    if (companyNum) companyNameToNums.get(companyName).add(companyNum);
+  }
 
   const ingredients = ingredientNames.map((name) => {
     seenApprilNames.add(name);
@@ -262,6 +270,32 @@ if (apprilLooseDups.length) {
   }
 } else {
   console.log('APPRIL data: no loose duplicates within ingredient names.');
+}
+
+// 3b. Loose-norm duplicates within APPRIL company names.
+// Company number(s) shown in brackets — same number = data-entry inconsistency; different = investigate.
+const companyByLoose = new Map();
+for (const name of companyNameToNums.keys()) {
+  const key = looseNorm(name);
+  if (!companyByLoose.has(key)) companyByLoose.set(key, []);
+  companyByLoose.get(key).push(name);
+}
+const companyLooseDups = [...companyByLoose.values()].filter((v) => v.length > 1);
+if (companyLooseDups.length) {
+  console.warn(
+    `\nAPPRIL data — ${companyLooseDups.length} loose-duplicate company name group(s) (fix the CSV):`,
+  );
+  for (const group of companyLooseDups.sort((a, b) => a[0].localeCompare(b[0]))) {
+    const detail = group
+      .map((n) => {
+        const nums = [...(companyNameToNums.get(n) ?? [])].sort().join(', ');
+        return `"${n}"${nums ? ` [#${nums}]` : ''}`;
+      })
+      .join('  vs  ');
+    console.warn('  ' + detail);
+  }
+} else {
+  console.log('APPRIL data: no loose duplicates within company names.');
 }
 
 // 4. Cross-file loose matches: APPRIL name ↔ reference name that differ only by punct/case,
