@@ -1,22 +1,23 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import TypeBadge from './lib/components/TypeBadge.svelte';
 	import DetailDialog from './lib/components/DetailDialog.svelte';
 	import DataTable from './lib/components/DataTable.svelte';
 	import { Search, X, RotateCcw } from 'lucide-svelte';
+	import type { Product, ColDef } from './lib/types.ts';
 
-	let products = $state([]);
+	let products = $state<Product[]>([]);
 	let loading = $state(true);
-	let fetchError = $state(null);
+	let fetchError = $state<string | null>(null);
 
 	let searchQuery = $state('');
 	let selectedCrop = $state('All');
-	let selectedTypes = $state(new Set());
+	let selectedTypes = $state<Set<string>>(new Set());
 	let selectedCount = $state('All');
 	let sortCol = $state('productName');
-	let sortDir = $state('asc');
+	let sortDir = $state<'asc' | 'desc'>('asc');
 
-	let selectedProduct = $state(null);
+	let selectedProduct = $state<Product | null>(null);
 	let dialogOpen = $state(false);
 
 	const CROPS = ['All', 'Alfalfa', 'Corn', 'Cotton', 'Small Grains', 'Soybean'];
@@ -31,16 +32,16 @@
 
 	// All available columns in default display order.
 	// Add/remove entries here to expose new columns; toggle visibility via visibleColumnKeys.
-	const ALL_COLUMNS = [
-		{ key: 'productName', label: 'Product Name', sortable: true },
+	const ALL_COLUMNS: ColDef[] = [
 		{ key: 'company', label: 'Company', sortable: true, tdClass: 'text-gray-600 text-xs' },
+		{ key: 'productName', label: 'Trade Name', sortable: true },
 		{ key: 'ingredients', label: 'Active Ingredients', tdClass: 'text-gray-600 max-w-xs' },
 		{ key: 'primaryTypes', label: 'Type' },
 		{ key: 'crops', label: 'Crops', tdClass: 'text-gray-600 text-xs max-w-[180px]' },
 		{ key: 'ingredientCount', label: '# AIs', sortable: true, tdClass: 'text-center text-gray-600' }
 	];
 
-	let visibleColumnKeys = $state([
+	let visibleColumnKeys = $state<string[]>([
 		'company',
 		'productName',
 		'ingredients',
@@ -55,9 +56,9 @@
 		try {
 			const res = await fetch('/data.json');
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
-			products = await res.json();
+			products = (await res.json()) as Product[];
 		} catch (e) {
-			fetchError = e.message;
+			fetchError = e instanceof Error ? e.message : String(e);
 		} finally {
 			loading = false;
 		}
@@ -92,15 +93,15 @@
 		}
 
 		return [...result].sort((a, b) => {
-			let av = a[sortCol];
-			let bv = b[sortCol];
+			const av = (a as unknown as Record<string, unknown>)[sortCol];
+			const bv = (b as unknown as Record<string, unknown>)[sortCol];
 			if (typeof av === 'number' && typeof bv === 'number') {
 				return sortDir === 'asc' ? av - bv : bv - av;
 			}
-			av = String(av ?? '').toLowerCase();
-			bv = String(bv ?? '').toLowerCase();
-			if (av < bv) return sortDir === 'asc' ? -1 : 1;
-			if (av > bv) return sortDir === 'asc' ? 1 : -1;
+			const as_ = String(av ?? '').toLowerCase();
+			const bs_ = String(bv ?? '').toLowerCase();
+			if (as_ < bs_) return sortDir === 'asc' ? -1 : 1;
+			if (as_ > bs_) return sortDir === 'asc' ? 1 : -1;
 			return 0;
 		});
 	});
@@ -112,7 +113,7 @@
 			selectedCount !== 'All'
 	);
 
-	function setSort(col) {
+	function setSort(col: string) {
 		if (sortCol === col) {
 			sortDir = sortDir === 'asc' ? 'desc' : 'asc';
 		} else {
@@ -121,7 +122,7 @@
 		}
 	}
 
-	function toggleType(code) {
+	function toggleType(code: string) {
 		const next = new Set(selectedTypes);
 		if (next.has(code)) next.delete(code);
 		else next.add(code);
@@ -135,14 +136,13 @@
 		selectedCount = 'All';
 	}
 
-	function openDetail(p) {
-		selectedProduct = p;
+	function openDetail(row: Product) {
+		selectedProduct = row;
 		dialogOpen = true;
 	}
 
-	/** @param {{ name: string }[]} ingredients */
-	function ingredientNames(ingredients) {
-		return ingredients.map((i) => i.name).join(', ');
+	function ingredientNames(product: Product): string {
+		return product.ingredients.map((i) => i.name).join(', ');
 	}
 </script>
 
@@ -275,9 +275,9 @@
 					{sortDir}
 					onSort={setSort}
 					onRowClick={openDetail}
-					rowKey={(p) => p.regNum + p.productName}
+					rowKey={(p: Product) => p.regNum + p.productName}
 				>
-					{#snippet cell(col, product)}
+					{#snippet cell(col: ColDef, product: Product)}
 						{#if col.key === 'company'}
 							{product.company}
 						{:else if col.key === 'productName'}
@@ -291,7 +291,7 @@
 								{/if}
 							</span>
 						{:else if col.key === 'ingredients'}
-							{ingredientNames(product.ingredients)}
+							{ingredientNames(product)}
 						{:else if col.key === 'primaryTypes'}
 							<div class="flex flex-wrap gap-1">
 								{#each product.primaryTypes as t}
