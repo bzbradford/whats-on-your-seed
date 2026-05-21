@@ -1,8 +1,6 @@
 # What's on Your Seed?
 
-A searchable, iframe-embeddable web widget for the UW–Madison NPM Program's seed treatment database. Replaces the static PDF (`UW-NPM-Whats-on-your-seed.pdf`) with a live, filterable table of EPA-registered seed treatment products for corn, soybean, small grains, alfalfa, and cotton.
-
-**Authors:** Mikael Geiziter, Jordan Scholar & Mimi Broeske (NPM Program); Damon Smith (Plant Pathology). Published at ipcm.wisc.edu.
+A searchable, iframe-embeddable web widget for the [Crop Protection Network's](https://cropprotectionnetwork.org/). Replaces the old static PDF with a live, filterable table of EPA-registered seed treatment products for corn, soybean, small grains, alfalfa, and cotton. Data is updated annually from the [EPA's APPRIL pesticide database](https://www.epa.gov/ingredients-used-pesticide-products/how-search-information-about-pesticide-ingredients-and-labels).
 
 ---
 
@@ -25,15 +23,15 @@ npm run build
 
 ```
 whats-on-your-seed/
-├── data/                          # Source-of-truth CSV files (never hand-edit)
-│   ├── Seed Treatments.csv        # Ingredient reference table (type codes)
+├── data/                          # Source-of-truth CSV files
+│   ├── Seed Treatments.csv        # Ingredient reference table
 │   └── Seed Treatments - APPRIL data.csv   # EPA product registrations
 │
 ├── public/
 │   └── data.json                  # Generated — do not edit (output of build:data)
 │
 ├── scripts/
-│   └── build-data.js              # CSV → JSON pipeline (Node, runs with build:data)
+│   └── build-data.js              # CSV → JSON pipeline (Node, invoke with `npm run build:data`)
 │
 ├── src/
 │   ├── App.svelte                 # Root component: search, filters, table, dialog
