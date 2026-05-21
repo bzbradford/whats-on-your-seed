@@ -14,6 +14,8 @@
 	let selectedCrop = $state('All');
 	let selectedTypes = $state<Set<string>>(new Set());
 	let selectedCount = $state('All');
+	let selectedCompany = $state('All');
+	let selectedIngredient = $state('All');
 	let sortCol = $state('productName');
 	let sortDir = $state<'asc' | 'desc'>('asc');
 
@@ -35,7 +37,12 @@
 	const ALL_COLUMNS: ColDef[] = [
 		{ key: 'company', label: 'Company', sortable: true, tdClass: 'text-gray-600 text-xs' },
 		{ key: 'productName', label: 'Trade Name', sortable: true },
-		{ key: 'ingredients', label: 'Active Ingredients', tdClass: 'text-gray-600 max-w-xs' },
+		{
+			key: 'ingredients',
+			label: 'Active Ingredients',
+			tdClass: 'text-gray-600 max-w-xs',
+			sortable: true
+		},
 		{ key: 'primaryTypes', label: 'Type' },
 		{ key: 'crops', label: 'Crops', tdClass: 'text-gray-600 text-xs max-w-[180px]' },
 		{ key: 'ingredientCount', label: '# AIs', sortable: true, tdClass: 'text-center text-gray-600' }
@@ -51,6 +58,12 @@
 	]);
 
 	let visibleColumns = $derived(ALL_COLUMNS.filter((c) => visibleColumnKeys.includes(c.key)));
+
+	let allCompanies = $derived(['All', ...[...new Set(products.map((p) => p.company))].sort()]);
+	let allIngredients = $derived([
+		'All',
+		...[...new Set(products.flatMap((p) => p.ingredients.map((i) => i.name)))].sort()
+	]);
 
 	onMount(async () => {
 		try {
@@ -92,16 +105,22 @@
 			);
 		}
 
+		if (selectedCompany !== 'All') {
+			result = result.filter((p) => p.company === selectedCompany);
+		}
+
+		if (selectedIngredient !== 'All') {
+			result = result.filter((p) => p.ingredients.some((i) => i.name === selectedIngredient));
+		}
+
 		return [...result].sort((a, b) => {
-			const av = (a as unknown as Record<string, unknown>)[sortCol];
-			const bv = (b as unknown as Record<string, unknown>)[sortCol];
+			const av = getSortValue(a, sortCol);
+			const bv = getSortValue(b, sortCol);
 			if (typeof av === 'number' && typeof bv === 'number') {
 				return sortDir === 'asc' ? av - bv : bv - av;
 			}
-			const as_ = String(av ?? '').toLowerCase();
-			const bs_ = String(bv ?? '').toLowerCase();
-			if (as_ < bs_) return sortDir === 'asc' ? -1 : 1;
-			if (as_ > bs_) return sortDir === 'asc' ? 1 : -1;
+			if (av < bv) return sortDir === 'asc' ? -1 : 1;
+			if (av > bv) return sortDir === 'asc' ? 1 : -1;
 			return 0;
 		});
 	});
@@ -110,7 +129,9 @@
 		searchQuery.trim() !== '' ||
 			selectedCrop !== 'All' ||
 			selectedTypes.size > 0 ||
-			selectedCount !== 'All'
+			selectedCount !== 'All' ||
+			selectedCompany !== 'All' ||
+			selectedIngredient !== 'All'
 	);
 
 	function setSort(col: string) {
@@ -134,6 +155,8 @@
 		selectedCrop = 'All';
 		selectedTypes = new Set();
 		selectedCount = 'All';
+		selectedCompany = 'All';
+		selectedIngredient = 'All';
 	}
 
 	function openDetail(row: Product) {
@@ -143,6 +166,21 @@
 
 	function ingredientNames(product: Product): string {
 		return product.ingredients.map((i) => i.name).join(', ');
+	}
+
+	// Returns a scalar sort key for fields that are arrays in the data model.
+	// Array-valued fields sort by their first element; everything else sorts by
+	// the raw value (number) or its lowercased string representation.
+	function getSortValue(product: Product, col: string): string | number {
+		switch (col) {
+			case 'ingredients': return product.ingredients[0]?.name ?? '';
+			case 'primaryTypes': return product.primaryTypes[0] ?? '';
+			case 'crops':        return product.crops[0] ?? '';
+			default: {
+				const val = (product as unknown as Record<string, unknown>)[col];
+				return typeof val === 'number' ? val : String(val ?? '').toLowerCase();
+			}
+		}
 	}
 </script>
 
@@ -195,18 +233,36 @@
 				</select>
 			</div>
 
-			<!-- # AIs -->
+			<!-- Company -->
 			<div class="flex items-center gap-2">
-				<label for="count-filter" class="font-medium text-gray-600 text-xs uppercase tracking-wide"
-					># AIs</label
+				<label
+					for="company-filter"
+					class="font-medium text-gray-600 text-xs uppercase tracking-wide">Company</label
 				>
 				<select
-					id="count-filter"
-					bind:value={selectedCount}
-					class="bg-white py-1 pr-6 pl-2 border border-gray-300 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+					id="company-filter"
+					bind:value={selectedCompany}
+					class="bg-white py-1 pr-6 pl-2 border border-gray-300 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 max-w-50 text-sm"
 				>
-					{#each AI_COUNTS as c}
-						<option value={c}>{c}</option>
+					{#each allCompanies as co}
+						<option value={co}>{co}</option>
+					{/each}
+				</select>
+			</div>
+
+			<!-- Active Ingredient -->
+			<div class="flex items-center gap-2">
+				<label
+					for="ingredient-filter"
+					class="font-medium text-gray-600 text-xs uppercase tracking-wide">Ingredient</label
+				>
+				<select
+					id="ingredient-filter"
+					bind:value={selectedIngredient}
+					class="bg-white py-1 pr-6 pl-2 border border-gray-300 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 max-w-50 text-sm"
+				>
+					{#each allIngredients as ing}
+						<option value={ing}>{ing}</option>
 					{/each}
 				</select>
 			</div>
@@ -246,6 +302,22 @@
 					{/each}
 				</div>
 			</div>
+
+			<!-- # AIs -->
+			<!-- <div class="flex items-center gap-2">
+				<label for="count-filter" class="font-medium text-gray-600 text-xs uppercase tracking-wide"
+					># AIs</label
+				>
+				<select
+					id="count-filter"
+					bind:value={selectedCount}
+					class="bg-white py-1 pr-6 pl-2 border border-gray-300 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+				>
+					{#each AI_COUNTS as c}
+						<option value={c}>{c}</option>
+					{/each}
+				</select>
+			</div> -->
 
 			<!-- Reset -->
 			{#if hasFilters}
