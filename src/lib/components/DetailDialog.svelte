@@ -10,12 +10,6 @@
   }
 
   let { open = $bindable(false), product }: Props = $props();
-
-  const SIGNAL_WORD_COLOR: Record<string, string> = {
-    Danger: 'text-red-700 font-bold',
-    Warning: 'text-amber-700 font-semibold',
-    Caution: 'text-yellow-700',
-  };
 </script>
 
 <Dialog.Root bind:open>
@@ -26,12 +20,12 @@
     >
       {#if product}
         <!-- Header -->
-        <div class="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4">
+        <div class="dialog-header">
           <div>
             <Dialog.Title class="text-lg leading-tight font-semibold text-gray-900">
               {product.productName}
             </Dialog.Title>
-            <p class="mt-0.5 text-sm text-gray-500">{product.company}</p>
+            <p class="dialog-subtitle">{product.company}</p>
           </div>
           <Dialog.Close
             class="shrink-0 rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
@@ -42,26 +36,26 @@
         </div>
 
         <!-- Body -->
-        <div class="space-y-4 overflow-y-auto px-6 py-4 text-sm">
+        <div class="dialog-body">
           <!-- Key facts grid -->
-          <dl class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+          <dl class="facts-grid">
             <!-- Active ingredients -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Active ingredients</dt>
-              <dd class="text-gray-800">
+              <dt class="fact-label">Active ingredients</dt>
+              <dd class="fact-value">
                 <ul>
                   {#each product.ingredients as ing}
                     <li>
                       {#if ing.primaryType}
-                        <span class="inline-flex items-center gap-1">
-                          <span class="text-gray-700">{ing.name}</span>
+                        <span class="ingredient-row">
+                          <span class="ingredient-name">{ing.name}</span>
                           <TypeBadge type={ing.primaryType} showLabel />
                           {#if ing.secondaryType}
                             <TypeBadge type={ing.secondaryType} showLabel />
                           {/if}
                         </span>
                       {:else}
-                        <span class="text-gray-700">{ing.name}</span>
+                        <span class="ingredient-name">{ing.name}</span>
                       {/if}
                     </li>
                   {/each}
@@ -71,85 +65,83 @@
 
             <!-- Signal Word -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Signal Word</dt>
-              <dd class={SIGNAL_WORD_COLOR[product.signalWord] ?? 'text-gray-800'}>
+              <dt class="fact-label">Signal Word</dt>
+              <dd class="signal-word" data-signal={product.signalWord}>
                 {product.signalWord || '—'}
               </dd>
             </div>
 
             <!-- Pesticide Category -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Pesticide Category</dt>
-              <dd class="text-gray-800">{product.pesticideCategory || '—'}</dd>
+              <dt class="fact-label">Pesticide Category</dt>
+              <dd class="fact-value">{product.pesticideCategory || '—'}</dd>
             </div>
 
             <!-- Crops -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Crops</dt>
-              <dd class="text-gray-800">{product.crops.join(', ') || '—'}</dd>
+              <dt class="fact-label">Crops</dt>
+              <dd class="fact-value">{product.crops.join(', ') || '—'}</dd>
             </div>
 
             <!-- Physical Form -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Physical Form</dt>
-              <dd class="text-gray-800">{product.physicalForm || '—'}</dd>
+              <dt class="fact-label">Physical Form</dt>
+              <dd class="fact-value">{product.physicalForm || '—'}</dd>
             </div>
 
             <!-- Registration # -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Registration #</dt>
-              <dd class="text-gray-800">{product.regNum}</dd>
+              <dt class="fact-label">Registration #</dt>
+              <dd class="fact-value">{product.regNum}</dd>
             </div>
 
             <!-- Registration Type -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Registration Type</dt>
-              <dd class="text-gray-800">{product.regType || '—'}</dd>
+              <dt class="fact-label">Registration Type</dt>
+              <dd class="fact-value">{product.regType || '—'}</dd>
             </div>
 
             <!-- Status -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Status</dt>
-              <dd class="text-gray-800">{product.status}</dd>
+              <dt class="fact-label">Status</dt>
+              <dd class="fact-value">{product.status}</dd>
             </div>
 
             <!-- Status Date -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Status Date</dt>
-              <dd class="text-gray-800">{product.statusDate || '—'}</dd>
+              <dt class="fact-label">Status Date</dt>
+              <dd class="fact-value">{product.statusDate || '—'}</dd>
             </div>
 
             <!-- First Registered -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">First Registered</dt>
-              <dd class="text-gray-800">{product.dateFirstRegistered || '—'}</dd>
+              <dt class="fact-label">First Registered</dt>
+              <dd class="fact-value">{product.dateFirstRegistered || '—'}</dd>
             </div>
 
             <!-- Latest Label -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Latest Label</dt>
-              <dd class="text-gray-800">{product.latestLabelDate || '—'}</dd>
+              <dt class="fact-label">Latest Label</dt>
+              <dd class="fact-value">{product.latestLabelDate || '—'}</dd>
             </div>
 
             <!-- Similar Product (Me Too) -->
             {#if product.meeToo}
               <div>
-                <dt class="text-xs tracking-wide text-gray-400 uppercase">
-                  Similar Product (Me Too)
-                </dt>
-                <dd class="text-gray-700">{product.meeToo}</dd>
+                <dt class="fact-label">Similar Product (Me Too)</dt>
+                <dd class="fact-value-muted">{product.meeToo}</dd>
               </div>
             {/if}
 
             <!-- Label lookup -->
             <div>
-              <dt class="text-xs tracking-wide text-gray-400 uppercase">Label Lookup</dt>
+              <dt class="fact-label">Label Lookup</dt>
               <dd>
                 <a
                   href={`https://agrian.com/labelcenter/results.cfm?q=${encodeURIComponent(product.productName)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="text-blue-600 hover:underline"
+                  class="external-link"
                 >
                   Search for label on Agrian
                 </a>
@@ -159,7 +151,7 @@
 
           <!-- Restricted Use -->
           {#if product.restrictedUse}
-            <div class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+            <div class="rup-notice">
               <strong>Restricted Use Pesticide</strong>
               {#if product.restrictedUseReason}
                 — {product.restrictedUseReason}
@@ -170,16 +162,16 @@
           <!-- Transfer History -->
           {#if product.transferHistory}
             <div>
-              <p class="mb-0.5 text-xs tracking-wide text-gray-400 uppercase">Transfer History</p>
-              <p class="font-mono text-xs text-gray-600">{product.transferHistory}</p>
+              <p class="section-label">Transfer History</p>
+              <p class="transfer-history">{product.transferHistory}</p>
             </div>
           {/if}
 
           <!-- Notes -->
           {#if product.notes}
             <div>
-              <p class="mb-0.5 text-xs tracking-wide text-gray-400 uppercase">Notes</p>
-              <p class="text-gray-700">{product.notes}</p>
+              <p class="section-label">Notes</p>
+              <p class="notes-text">{product.notes}</p>
             </div>
           {/if}
         </div>
@@ -187,3 +179,65 @@
     </Dialog.Content>
   </Dialog.Portal>
 </Dialog.Root>
+
+<style>
+  @reference "../../app.css";
+
+  .dialog-header {
+    @apply flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4;
+  }
+  .dialog-subtitle {
+    @apply mt-0.5 text-sm text-gray-500;
+  }
+  .dialog-body {
+    @apply space-y-4 overflow-y-auto px-6 py-4 text-sm;
+  }
+  .facts-grid {
+    @apply grid grid-cols-2 gap-x-6 gap-y-2 text-sm;
+  }
+  .fact-label {
+    @apply text-xs tracking-wide text-gray-400 uppercase;
+  }
+  .fact-value {
+    @apply text-gray-800;
+  }
+  .fact-value-muted {
+    @apply text-gray-700;
+  }
+  .ingredient-row {
+    @apply inline-flex items-center gap-1;
+  }
+  .ingredient-name {
+    @apply text-gray-700;
+  }
+  .signal-word {
+    @apply text-gray-800;
+  }
+  .signal-word[data-signal='Danger'] {
+    @apply text-red-700 font-bold;
+  }
+  .signal-word[data-signal='Warning'] {
+    @apply text-amber-700 font-semibold;
+  }
+  .signal-word[data-signal='Caution'] {
+    @apply text-yellow-700;
+  }
+  .external-link {
+    @apply text-blue-600;
+    &:hover {
+      @apply underline;
+    }
+  }
+  .rup-notice {
+    @apply rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800;
+  }
+  .section-label {
+    @apply mb-0.5 text-xs tracking-wide text-gray-400 uppercase;
+  }
+  .transfer-history {
+    @apply font-mono text-xs text-gray-600;
+  }
+  .notes-text {
+    @apply text-gray-700;
+  }
+</style>

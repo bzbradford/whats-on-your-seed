@@ -199,50 +199,38 @@
   }
 </script>
 
-<div class="min-h-screen bg-gray-50 font-sans">
-  <div class="mx-auto max-w-7xl px-4 py-6">
+<div class="page">
+  <div class="page-content">
     <!-- Header -->
-    <div class="mb-5">
-      <h1 class="text-2xl leading-tight font-bold text-gray-900">What's on Your Seed?</h1>
-      <p class="mt-1 text-sm text-gray-500">Crop Protection Network — Seed Treatment Database</p>
+    <div class="app-header">
+      <h1 class="app-title">What's on Your Seed?</h1>
+      <p class="app-subtitle">Crop Protection Network — Seed Treatment Database</p>
     </div>
 
     <!-- Search -->
-    <div class="relative mb-3">
-      <Search
-        size={16}
-        class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
-      />
+    <div class="search-wrapper">
+      <span class="search-icon" aria-hidden="true">
+        <Search size={16} />
+      </span>
       <input
         type="search"
         bind:value={searchQuery}
         placeholder="Search by name, active ingredient, or registrant…"
-        class="w-full rounded-lg border border-gray-300 bg-white py-2 pr-9 pl-9 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+        class="search-input"
       />
       {#if searchQuery}
-        <button
-          onclick={() => (searchQuery = '')}
-          class="absolute top-1/2 right-2.5 -translate-y-1/2 rounded p-0.5 text-gray-400 hover:text-gray-600"
-          aria-label="Clear search"
-        >
+        <button onclick={() => (searchQuery = '')} class="search-clear" aria-label="Clear search">
           <X size={14} />
         </button>
       {/if}
     </div>
 
     <!-- Filters -->
-    <div class="mb-4 flex flex-wrap items-center gap-4">
+    <div class="filters-row">
       <!-- Registrant -->
-      <div class="flex items-center gap-2">
-        <label
-          for="company-filter"
-          class="text-xs font-medium tracking-wide text-gray-600 uppercase">Registrant</label
-        >
-        <select
-          id="company-filter"
-          bind:value={selectedCompany}
-          class="max-w-50 rounded border border-gray-300 bg-white py-1 pr-6 pl-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-        >
+      <div class="filter-group">
+        <label for="company-filter" class="filter-label">Registrant</label>
+        <select id="company-filter" bind:value={selectedCompany} class="filter-select max-w-50">
           {#each allCompanies as co}
             <option value={co}>{co}</option>
           {/each}
@@ -250,15 +238,12 @@
       </div>
 
       <!-- Active Ingredient -->
-      <div class="flex items-center gap-2">
-        <label
-          for="ingredient-filter"
-          class="text-xs font-medium tracking-wide text-gray-600 uppercase">Ingredient</label
-        >
+      <div class="filter-group">
+        <label for="ingredient-filter" class="filter-label">Ingredient</label>
         <select
           id="ingredient-filter"
           bind:value={selectedIngredient}
-          class="max-w-50 rounded border border-gray-300 bg-white py-1 pr-6 pl-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+          class="filter-select max-w-50"
         >
           {#each allIngredients as ing}
             <option value={ing}>{ing}</option>
@@ -267,34 +252,16 @@
       </div>
 
       <!-- Type toggle buttons -->
-      <div class="flex items-center gap-2">
-        <span class="text-xs font-medium tracking-wide text-gray-600 uppercase">Type</span>
-        <div class="flex gap-1.5">
+      <div class="filter-group">
+        <span class="filter-label">Type</span>
+        <div class="type-buttons">
           {#each TYPE_DEFS as { code, label }}
             <button
               onclick={() => toggleType(code)}
               title={label}
+              data-type={code}
               aria-pressed={selectedTypes.has(code)}
-              class="rounded border px-2 py-0.5 text-xs font-semibold transition-opacity {selectedTypes.has(
-                code,
-              )
-                ? 'opacity-100 ring-2 ring-blue-400 ring-offset-1'
-                : 'opacity-60 hover:opacity-100'}"
-              class:bg-blue-100={code === 'F'}
-              class:text-blue-800={code === 'F'}
-              class:border-blue-300={code === 'F'}
-              class:bg-amber-100={code === 'I'}
-              class:text-amber-800={code === 'I'}
-              class:border-amber-300={code === 'I'}
-              class:bg-green-100={code === 'N'}
-              class:text-green-800={code === 'N'}
-              class:border-green-300={code === 'N'}
-              class:bg-violet-100={code === 'P'}
-              class:text-violet-800={code === 'P'}
-              class:border-violet-300={code === 'P'}
-              class:bg-red-100={code === 'H'}
-              class:text-red-800={code === 'H'}
-              class:border-red-300={code === 'H'}
+              class="type-btn"
             >
               {label}
             </button>
@@ -302,15 +269,9 @@
         </div>
 
         <!-- Crop -->
-        <div class="flex items-center gap-2">
-          <label for="crop-filter" class="text-xs font-medium tracking-wide text-gray-600 uppercase"
-            >Crop</label
-          >
-          <select
-            id="crop-filter"
-            bind:value={selectedCrop}
-            class="rounded border border-gray-300 bg-white py-1 pr-6 pl-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-          >
+        <div class="filter-group">
+          <label for="crop-filter" class="filter-label">Crop</label>
+          <select id="crop-filter" bind:value={selectedCrop} class="filter-select">
             {#each CROPS as crop}
               <option value={crop}>{crop}</option>
             {/each}
@@ -318,28 +279,9 @@
         </div>
       </div>
 
-      <!-- # AIs -->
-      <!-- <div class="flex items-center gap-2">
-				<label for="count-filter" class="font-medium text-gray-600 text-xs uppercase tracking-wide"
-					># AIs</label
-				>
-				<select
-					id="count-filter"
-					bind:value={selectedCount}
-					class="bg-white py-1 pr-6 pl-2 border border-gray-300 focus:border-blue-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-				>
-					{#each AI_COUNTS as c}
-						<option value={c}>{c}</option>
-					{/each}
-				</select>
-			</div> -->
-
       <!-- Reset -->
       {#if hasFilters}
-        <button
-          onclick={resetFilters}
-          class="ml-auto flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700"
-        >
+        <button onclick={resetFilters} class="reset-btn">
           <RotateCcw size={12} />
           Reset
         </button>
@@ -347,13 +289,11 @@
     </div>
 
     <!-- Table -->
-    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="table-card">
       {#if loading}
-        <div class="flex items-center justify-center py-20 text-sm text-gray-400">Loading…</div>
+        <div class="loading-state">Loading…</div>
       {:else if fetchError}
-        <div class="flex items-center justify-center py-20 text-sm text-red-600">
-          Error loading data: {fetchError}
-        </div>
+        <div class="error-state">Error loading data: {fetchError}</div>
       {:else}
         <DataTable
           rows={filtered}
@@ -368,24 +308,21 @@
             {#if col.key === 'company'}
               {product.company || '—'}
             {:else if col.key === 'productName'}
-              <span class="font-medium text-gray-900">
+              <span class="product-name">
                 {product.productName}
                 {#if product.restrictedUse}
-                  <span
-                    class="ml-1 text-xs font-normal text-red-600"
-                    title="Restricted Use Pesticide">RUP</span
-                  >
+                  <span class="rup-badge" title="Restricted Use Pesticide">RUP</span>
                 {/if}
               </span>
             {:else if col.key === 'ingredients'}
               {ingredientNames(product) || '—'}
             {:else if col.key === 'primaryTypes'}
-              <div class="flex flex-wrap gap-1">
+              <div class="type-cell">
                 {#each product.primaryTypes as t}
                   <TypeBadge type={t} />
                 {/each}
                 {#if product.primaryTypes.length === 0}
-                  <span class="text-xs text-gray-400">—</span>
+                  <span class="empty-type">—</span>
                 {/if}
               </div>
             {:else if col.key === 'crops'}
@@ -397,7 +334,7 @@
         </DataTable>
 
         <!-- Footer count -->
-        <div class="border-t border-gray-100 px-4 py-2 text-xs text-gray-400">
+        <div class="table-footer">
           {#if hasFilters}
             Showing {filtered.length} of {products.length} products
           {:else}
@@ -410,3 +347,117 @@
 </div>
 
 <DetailDialog bind:open={dialogOpen} product={selectedProduct} />
+
+<style>
+  @reference "./app.css";
+
+  .page {
+    @apply min-h-screen bg-gray-50 font-sans;
+  }
+  .page-content {
+    @apply mx-auto max-w-7xl px-4 py-6;
+  }
+  .app-header {
+    @apply mb-5;
+  }
+  .app-title {
+    @apply text-2xl leading-tight font-bold text-gray-900;
+  }
+  .app-subtitle {
+    @apply mt-1 text-sm text-gray-500;
+  }
+  .search-wrapper {
+    @apply relative mb-3;
+  }
+  .search-icon {
+    @apply pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400;
+  }
+  .search-input {
+    @apply w-full rounded-lg border border-gray-300 bg-white py-2 pr-9 pl-9 text-sm shadow-sm;
+    &::placeholder {
+      @apply text-gray-400;
+    }
+    &:focus {
+      @apply border-blue-500 ring-1 ring-blue-500 outline-none;
+    }
+  }
+  .search-clear {
+    @apply absolute top-1/2 right-2.5 -translate-y-1/2 rounded p-0.5 text-gray-400;
+    &:hover {
+      @apply text-gray-600;
+    }
+  }
+  .filters-row {
+    @apply mb-4 flex flex-wrap items-center gap-4;
+  }
+  .filter-group {
+    @apply flex items-center gap-2;
+  }
+  .filter-label {
+    @apply text-xs font-medium tracking-wide text-gray-600 uppercase;
+  }
+  .filter-select {
+    display: unset;
+    @apply rounded border border-gray-300 bg-white py-1 pr-6 pl-2 text-sm;
+    &:focus {
+      @apply border-blue-500 ring-1 ring-blue-500 outline-none;
+    }
+  }
+  .type-buttons {
+    @apply flex gap-1.5;
+  }
+  .type-btn {
+    @apply rounded border px-2 py-0.5 text-xs font-semibold opacity-60 transition-opacity;
+    &:hover {
+      @apply opacity-100;
+    }
+    &[aria-pressed='true'] {
+      @apply opacity-100 ring-2 ring-blue-400 ring-offset-1;
+    }
+    &[data-type='F'] {
+      @apply border-blue-300 bg-blue-100 text-blue-800;
+    }
+    &[data-type='I'] {
+      @apply border-amber-300 bg-amber-100 text-amber-800;
+    }
+    &[data-type='N'] {
+      @apply border-green-300 bg-green-100 text-green-800;
+    }
+    &[data-type='P'] {
+      @apply border-violet-300 bg-violet-100 text-violet-800;
+    }
+    &[data-type='H'] {
+      @apply border-red-300 bg-red-100 text-red-800;
+    }
+  }
+  .reset-btn {
+    @apply ml-auto flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-500 transition-colors;
+    &:hover {
+      @apply bg-gray-200 text-gray-700;
+    }
+  }
+  .table-card {
+    @apply overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm;
+  }
+  .loading-state {
+    @apply flex items-center justify-center py-20 text-sm text-gray-400;
+  }
+  .error-state {
+    @apply flex items-center justify-center py-20 text-sm text-red-600;
+  }
+  .product-name {
+    @apply font-medium text-gray-900;
+  }
+  .rup-badge {
+    @apply ml-1 text-xs font-normal text-red-600;
+  }
+  .type-cell {
+    @apply flex flex-wrap gap-1;
+  }
+  .empty-type {
+    @apply text-xs text-gray-400;
+  }
+  .table-footer {
+    @apply border-t border-gray-100 px-4 py-2 text-xs text-gray-400;
+  }
+</style>
