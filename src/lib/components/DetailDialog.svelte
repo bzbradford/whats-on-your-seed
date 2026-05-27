@@ -214,10 +214,10 @@
     @apply text-gray-800;
   }
   .signal-word[data-signal='Danger'] {
-    @apply text-red-700 font-bold;
+    @apply font-bold text-red-700;
   }
   .signal-word[data-signal='Warning'] {
-    @apply text-amber-700 font-semibold;
+    @apply font-semibold text-amber-700;
   }
   .signal-word[data-signal='Caution'] {
     @apply text-yellow-700;

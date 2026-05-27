@@ -30,21 +30,21 @@
 
   .badge {
     @apply inline-flex items-center rounded border px-1.5 py-0.5 text-xs leading-none font-semibold;
-    @apply bg-gray-100 text-gray-700 border-gray-300;
+    @apply border-gray-300 bg-gray-100 text-gray-700;
   }
   .badge[data-type='F'] {
-    @apply bg-blue-100 text-blue-800 border-blue-300;
+    @apply border-blue-300 bg-blue-100 text-blue-800;
   }
   .badge[data-type='I'] {
-    @apply bg-amber-100 text-amber-800 border-amber-300;
+    @apply border-amber-300 bg-amber-100 text-amber-800;
   }
   .badge[data-type='N'] {
-    @apply bg-green-100 text-green-800 border-green-300;
+    @apply border-green-300 bg-green-100 text-green-800;
   }
   .badge[data-type='P'] {
-    @apply bg-violet-100 text-violet-800 border-violet-300;
+    @apply border-violet-300 bg-violet-100 text-violet-800;
   }
   .badge[data-type='H'] {
-    @apply bg-red-100 text-red-800 border-red-300;
+    @apply border-red-300 bg-red-100 text-red-800;
   }
 </style>

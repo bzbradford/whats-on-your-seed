@@ -9,7 +9,6 @@
   let products = $state<Product[]>([]);
   let loading = $state(true);
   let fetchError = $state<string | null>(null);
-
   let searchQuery = $state('');
   let selectedCrop = $state('All');
   let selectedTypes = $state<Set<string>>(new Set());
@@ -18,7 +17,6 @@
   let selectedIngredient = $state('All');
   let sortCol = $state('productName');
   let sortDir = $state<'asc' | 'desc'>('asc');
-
   let selectedProduct = $state<Product | null>(null);
   let dialogOpen = $state(false);
 
@@ -30,7 +28,6 @@
     { code: 'P', label: 'PGR' },
     // { code: 'H', label: 'Herbicide' } // no herbicides in the list currently
   ];
-  // const AI_COUNTS = ['All', '1', '2', '3', '4', '5', '6+'];
 
   // All available columns in default display order.
   // Add/remove entries here to expose new columns; toggle visibility via visibleColumnKeys.
@@ -64,30 +61,19 @@
 
   let visibleColumns = $derived(ALL_COLUMNS.filter((c) => visibleColumnKeys.includes(c.key)));
 
-  let allCompanies = $derived([
-    'All',
-    ...[...new Set(products.map((p) => p.company).filter((c) => c))].sort((a, b) =>
+  // Filter values
+  let sortedCompanies = $derived(
+    [...new Set(products.map((p) => p.company).filter((c) => c))].sort((a, b) =>
       a.toLowerCase().localeCompare(b.toLowerCase()),
     ),
-  ]);
-  let allIngredients = $derived([
-    'All',
-    ...[
-      ...new Set(products.flatMap((p) => p.ingredients.map((i) => i.name).filter((n) => n))),
-    ].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())),
-  ]);
-
-  onMount(async () => {
-    try {
-      const res = await fetch(`${import.meta.env.BASE_URL}data.json`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      products = (await res.json()) as Product[];
-    } catch (e) {
-      fetchError = e instanceof Error ? e.message : String(e);
-    } finally {
-      loading = false;
-    }
-  });
+  );
+  let allCompanies = $derived(['All', ...sortedCompanies]);
+  let sortedIngredients = $derived(
+    [...new Set(products.flatMap((p) => p.ingredients.map((i) => i.name).filter((n) => n)))].sort(
+      (a, b) => a.toLowerCase().localeCompare(b.toLowerCase()),
+    ),
+  );
+  let allIngredients = $derived(['All', ...sortedIngredients]);
 
   let filtered = $derived.by(() => {
     let result = products;
@@ -197,6 +183,18 @@
       }
     }
   }
+
+  onMount(async () => {
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}data.json`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      products = (await res.json()) as Product[];
+    } catch (e) {
+      fetchError = e instanceof Error ? e.message : String(e);
+    } finally {
+      loading = false;
+    }
+  });
 </script>
 
 <div class="page">
